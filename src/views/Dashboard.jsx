@@ -40,8 +40,9 @@ class Dashboard extends Component {
   constructor(props){
     super(props);
     this.state = {
-      total: null,
-      pplwM: null
+      masks: null,
+      nonmasks: null,
+      total: null
     }
   }
   createLegend(json) {
@@ -55,17 +56,23 @@ class Dashboard extends Component {
     return legend;
   }
   componentDidMount(){
-    axios.get(`https://dog.ceo/api/breeds/list/all`)
+    axios.get("http://192.168.0.157:5000/getData")
       .then(res => {
-        const newTotal = res.data.message;
-        console.log(res);
-        this.setState({total:newTotal})
-        console.log(newTotal);
+        const masks = parseInt(res.data.masks, 10)
+        const nonmasks = parseInt(res.data.nonmasks, 10)
+        const total = parseInt(masks, 10)+parseInt(nonmasks, 10)
+        console.log(res)
+        this.setState({
+          masks: masks,
+          nonmasks: nonmasks,
+          total:total
+        })
+        console.log(this.state);
       })
   }
     
   render() {
-    
+    console.log(typeof (this.state.masks));
     return (
       <div className="content">
         <Grid fluid>
@@ -83,7 +90,7 @@ class Dashboard extends Component {
               <StatsCard
                 bigIcon={<i className="pe-7s-wallet text-success" />}
                 statsText="Customers with Masks"
-                statsValue= {this.state.total}
+                statsValue= {this.state.masks}
                 statsIcon={<i className="fa fa-calendar-o" />}
                 statsIconText="Last day"
               />
@@ -92,7 +99,7 @@ class Dashboard extends Component {
               <StatsCard
                 bigIcon={<i className="pe-7s-graph1 text-danger" />}
                 statsText="Customers without Masks"
-                statsValue="23"
+                statsValue={this.state.nonmasks}
                 statsIcon={<i className="fa fa-clock-o" />}
                 statsIconText="In the last hour"
               />
@@ -131,23 +138,25 @@ class Dashboard extends Component {
               />
             </Col>
             <Col md={4}>
+              {this.state.masks === null ? "" :
               <Card
                 statsIcon="fa fa-clock-o"
-                title="Email Statistics"
-                category="Last Campaign Performance"
+                title="Analytics"
+                category="Ratio of Masked to non masked"
                 stats="Campaign sent 2 days ago"
                 content={
                   <div
                     id="chartPreferences"
                     className="ct-chart ct-perfect-fourth"
                   >
-                    <ChartistGraph data={dataPie} type="Pie" />
+                    <ChartistGraph data ={{ labels:["Masks","No Masks"], series:[this.state.masks,this.state.nonmasks]}} type="Pie" />
                   </div>
                 }
                 legend={
                   <div className="legend">{this.createLegend(legendPie)}</div>
                 }
               />
+  }
             </Col>
           </Row>
 
