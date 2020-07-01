@@ -83,11 +83,11 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 
 
 def write_data(m, nm):
-	with open("data.txt", "r+") as f:
+	with open("data.txt", "r") as f:
 		me = int(f.readline())
 		nme = int(f.readline())
-
-		f.write("{}\n{}".format(me + m, nme + nm))
+		with open("data.txt", "w") as g:
+                        g.write("{}\n{}".format(me + m, nme + nm))
 
 
 # construct the argument parser and parse the arguments
