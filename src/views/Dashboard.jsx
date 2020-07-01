@@ -37,12 +37,13 @@ import {
 import axios from "axios";
 
 class Dashboard extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       masks: null,
       nonmasks: null,
-      total: null
+      total: null,
+      news: null,
     }
   }
   createLegend(json) {
@@ -55,24 +56,41 @@ class Dashboard extends Component {
     }
     return legend;
   }
-  componentDidMount(){
+  componentDidMount() {
     axios.get("http://192.168.0.157:5000/getData")
       .then(res => {
         const masks = parseInt(res.data.masks, 10)
         const nonmasks = parseInt(res.data.nonmasks, 10)
-        const total = parseInt(masks, 10)+parseInt(nonmasks, 10)
-        console.log(res)
+        const total = parseInt(masks, 10) + parseInt(nonmasks, 10)
         this.setState({
           masks: masks,
           nonmasks: nonmasks,
-          total:total
+          total: total
         })
-        console.log(this.state);
       })
+
+
+    axios.get("http://newsapi.org/v2/top-headlines?q=covid&from=2020-06-01&sortBy=publishedAt&apiKey=c275cc5378994ec59e3852ee892bebe6")
+    .then(res => {
+      const news = res.data.articles;
+      this.setState({
+        news:news
+      })
+    })
+
+      
   }
-    
+
+
   render() {
-    console.log(typeof (this.state.masks));
+    if (this.state.news != null){
+      const newsBars = this.state.news.map(item => 
+      <Tasks thing = {item.title}/>)
+      
+      
+    }
+    
+    
     return (
       <div className="content">
         <Grid fluid>
@@ -90,7 +108,7 @@ class Dashboard extends Component {
               <StatsCard
                 bigIcon={<i className="pe-7s-wallet text-success" />}
                 statsText="Customers with Masks"
-                statsValue= {this.state.masks}
+                statsValue={this.state.masks}
                 statsIcon={<i className="fa fa-calendar-o" />}
                 statsIconText="Last day"
               />
@@ -106,7 +124,7 @@ class Dashboard extends Component {
             </Col>
             <Col lg={3} sm={6}>
               <StatsCard
-                
+
                 statsText="Live Covid Cases - Waterloo"
                 statsValue="0"
                 statsIcon={<i className="fa fa-refresh" />}
@@ -120,8 +138,6 @@ class Dashboard extends Component {
                 statsIcon="fa fa-history"
                 id="chartHours"
                 title="Traffic"
-                category="24 Hours performance"
-                stats="Updated 3 minutes ago"
                 content={
                   <div className="ct-chart">
                     <ChartistGraph
@@ -139,24 +155,24 @@ class Dashboard extends Component {
             </Col>
             <Col md={4}>
               {this.state.masks === null ? "" :
-              <Card
-                statsIcon="fa fa-clock-o"
-                title="Analytics"
-                category="Ratio of Masked to non masked"
-                stats="Campaign sent 2 days ago"
-                content={
-                  <div
-                    id="chartPreferences"
-                    className="ct-chart ct-perfect-fourth"
-                  >
-                    <ChartistGraph data ={{ labels:["Masks","No Masks"], series:[this.state.masks,this.state.nonmasks]}} type="Pie" />
-                  </div>
-                }
-                legend={
-                  <div className="legend">{this.createLegend(legendPie)}</div>
-                }
-              />
-  }
+                <Card
+                  statsIcon="fa fa-clock-o"
+                  title="Analytics"
+                  category="Ratio of Masked to non masked"
+                  stats="Campaign sent 2 days ago"
+                  content={
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      <ChartistGraph data={{ labels: ["Masks", "No Masks"], series: [this.state.masks, this.state.nonmasks] }} type="Pie" />
+                    </div>
+                  }
+                  legend={
+                    <div className="legend">{this.createLegend(legendPie)}</div>
+                  }
+                />
+              }
             </Col>
           </Row>
 
@@ -181,8 +197,8 @@ class Dashboard extends Component {
                 }
               />
             </Col>
-
-            <Col md={6}>
+            {this.state.news === null ? "":
+              <Col md={6}>
               <Card
                 title="COVID-19 News"
                 category="Latest News regarding the COVID-19 Pandemic"
@@ -191,12 +207,16 @@ class Dashboard extends Component {
                 content={
                   <div className="table-full-width">
                     <table className="table">
-                      <Tasks />
+                      <tbody>
+                        {this.newsBars}
+                      </tbody>
                     </table>
                   </div>
                 }
               />
             </Col>
+            }
+
           </Row>
         </Grid>
       </div>
