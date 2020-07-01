@@ -20,6 +20,15 @@ app = Flask(__name__)
 
 from data import USER_DATA
 
+@app.route("/getData")
+def get_data():
+	global USER_DATA
+	return jsonify(USER_DATA)
+
+if __name__ == "__main__":
+        app.run()
+
+
 def detect_and_predict_mask(frame, faceNet, maskNet):
 	# grab the dimensions of the frame and then construct a blob
 	# from it
@@ -171,10 +180,6 @@ while True:
 		break
 
 
-@app.route("getData")
-def get_data():
-	global USER_DATA
-	return jsonify(USER_DATA)
 
 
 # do a bit of cleanup
