@@ -14,6 +14,12 @@ import cv2
 import os
 import imagezmq
 
+# Flask server
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+
+from data import USER_DATA
+
 def detect_and_predict_mask(frame, faceNet, maskNet):
 	# grab the dimensions of the frame and then construct a blob
 	# from it
@@ -56,8 +62,8 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 			print("Face detected:", face)
 			print(type(face))
 			if face.size == 0:
-                                print("Empty Array!!")
-                                break
+				print("Empty Array!!")
+				break
 			face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
 			face = cv2.resize(face, (224, 224))
 			face = img_to_array(face)
@@ -83,10 +89,10 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-f", "--face", type=str,
-	default="face_detector",
+	default="face-mask-detector/face_detector",
 	help="path to face detector model directory")
 ap.add_argument("-m", "--model", type=str,
-	default="mask_detector.model",
+	default="face-mask-detector/mask_detector.model",
 	help="path to trained face mask detector model")
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
 	help="minimum probability to filter weak detections")
@@ -110,6 +116,8 @@ print("[INFO] starting video stream...")
 #vs = VideoStream(src=0).start()
 time.sleep(2.0)
 
+label_prev = ""
+
 # loop over the frames from the video stream
 while True:
 	# grab the frame from the threaded video stream and resize it
@@ -123,6 +131,9 @@ while True:
 	# face mask or not
 	(locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
 
+	if not preds:
+		label_prev = ""
+
 	# loop over the detected face locations and their corresponding
 	# locations
 	for (box, pred) in zip(locs, preds):
@@ -134,6 +145,13 @@ while True:
 		# the bounding box and text
 		label = "Mask" if mask > withoutMask else "No Mask"
 		color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+
+		if label == "Mask" and label_prev != "Mask":
+			USER_DATA["masks"] += 1
+		elif label == "No Mask" and label_prev != "No Mask":
+			USER_DATA["non-masks"] += 1
+
+		label_prev = label
 
 		# include the probability in the label
 		label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
@@ -151,6 +169,13 @@ while True:
 	# if the `q` key was pressed, break from the loop
 	if key == ord("q"):
 		break
+
+
+@app.route("getData")
+def get_data():
+	global USER_DATA
+	return jsonify(USER_DATA)
+
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
