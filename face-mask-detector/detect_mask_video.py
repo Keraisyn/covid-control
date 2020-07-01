@@ -12,6 +12,12 @@ import imutils
 import time
 import cv2
 import os
+import imagezmq
+
+# Back end Flask server
+from flask import Flask
+app = Flask(__name__)
+
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
 	# grab the dimensions of the frame and then construct a blob
@@ -74,6 +80,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 	# locations
 	return (locs, preds)
 
+
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-f", "--face", type=str,
@@ -97,16 +104,21 @@ faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 print("[INFO] loading face mask detector model...")
 maskNet = load_model(args["model"])
 
-# initialize the video stream and allow the camera sensor to warm up
-print("[INFO] starting video stream...")
-vs = VideoStream(src=0).start()
+imageHub = imagezmq.ImageHub()
+
+
+# # initialize the video stream and allow the camera sensor to warm up
+# print("[INFO] starting video stream...")
+# vs = VideoStream(src=0).start()
 time.sleep(2.0)
+
 
 # loop over the frames from the video stream
 while True:
 	# grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
-	frame = vs.read()
+	(rpiName, frame) = imageHub.recv_image()
+	imageHub.send_reply(b'OK')
 	frame = imutils.resize(frame, width=400)
 
 	# detect faces in the frame and determine if they are wearing a
@@ -141,6 +153,11 @@ while True:
 	# if the `q` key was pressed, break from the loop
 	if key == ord("q"):
 		break
+
+
+@app.route("/getData", methods=["POST"])
+def
+
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
