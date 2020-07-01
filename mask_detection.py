@@ -14,10 +14,6 @@ import cv2
 import os
 import imagezmq
 
-# Back end Flask server
-from flask import Flask
-app = Flask(__name__)
-
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
 	# grab the dimensions of the frame and then construct a blob
@@ -58,6 +54,11 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 			# extract the face ROI, convert it from BGR to RGB channel
 			# ordering, resize it to 224x224, and preprocess it
 			face = frame[startY:endY, startX:endX]
+			print("Face detected:", face)
+			print(type(face))
+			if face.size == 0:
+				print("Empty Array!!")
+				break
 			face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
 			face = cv2.resize(face, (224, 224))
 			face = img_to_array(face)
@@ -81,13 +82,21 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 	return (locs, preds)
 
 
+def write_data(m, nm):
+	with open("data.txt", "r+") as f:
+		me = int(f.readline())
+		nme = int(f.readline())
+
+		f.write("{}\n{}".format(me + m, nme + nm))
+
+
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-f", "--face", type=str,
-	default="face_detector",
+	default="face-mask-detector/face_detector",
 	help="path to face detector model directory")
 ap.add_argument("-m", "--model", type=str,
-	default="mask_detector.model",
+	default="face-mask-detector/mask_detector.model",
 	help="path to trained face mask detector model")
 ap.add_argument("-c", "--confidence", type=float, default=0.5,
 	help="minimum probability to filter weak detections")
@@ -106,17 +115,18 @@ maskNet = load_model(args["model"])
 
 imageHub = imagezmq.ImageHub()
 
-
-# # initialize the video stream and allow the camera sensor to warm up
-# print("[INFO] starting video stream...")
-# vs = VideoStream(src=0).start()
+# initialize the video stream and allow the camera sensor to warm up
+print("[INFO] starting video stream...")
+#vs = VideoStream(src=0).start()
 time.sleep(2.0)
 
+label_prev = ""
 
 # loop over the frames from the video stream
 while True:
 	# grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
+	#frame = vs.read()
 	(rpiName, frame) = imageHub.recv_image()
 	imageHub.send_reply(b'OK')
 	frame = imutils.resize(frame, width=400)
@@ -124,6 +134,9 @@ while True:
 	# detect faces in the frame and determine if they are wearing a
 	# face mask or not
 	(locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
+
+	if preds == []:
+		label_prev = ""
 
 	# loop over the detected face locations and their corresponding
 	# locations
@@ -136,6 +149,13 @@ while True:
 		# the bounding box and text
 		label = "Mask" if mask > withoutMask else "No Mask"
 		color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+
+		if label == "Mask" and label_prev != "Mask":
+			write_data(1, 0)
+		elif label == "No Mask" and label_prev != "No Mask":
+			write_data(0, 1)
+
+		label_prev = label
 
 		# include the probability in the label
 		label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
@@ -155,8 +175,7 @@ while True:
 		break
 
 
-@app.route("/getData", methods=["POST"])
-def
+
 
 
 # do a bit of cleanup
