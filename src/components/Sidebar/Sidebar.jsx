@@ -20,8 +20,6 @@ import { NavLink } from "react-router-dom";
 
 import AdminNavbarLinks from "../Navbars/AdminNavbarLinks.jsx";
 
-import logo from "assets/img/reactlogo.png";
-
 class Sidebar extends Component {
   constructor(props) {
     super(props);
@@ -57,18 +55,18 @@ class Sidebar extends Component {
           )}
         <div className="logo">
           <a
-            href="https://www.pngrepo.com/png/104149/180/museum-antique-building-front.png"
+            href={'https://cdn.discordapp.com/attachments/580220254991679499/727964037446369381/logo.png'}
             className="simple-text logo-mini"
           >
             <div className="logo-img">
-              <img src='https://www.pngrepo.com/png/104149/180/museum-antique-building-front.png' alt="logo_image" />
+              <img src={'https://cdn.discordapp.com/attachments/580220254991679499/727964037446369381/logo.png'} alt="logo_image" />
             </div>
           </a>
           <a
-            href="https://www.pngrepo.com/png/104149/180/museum-antique-building-front.png"
+            href="https://cdn.discordapp.com/attachments/580220254991679499/727964037446369381/logo.png"
             className="simple-text logo-normal"
           >
-            Samer and Gang
+            Covid Control
           </a>
         </div>
         <div className="sidebar-wrapper">

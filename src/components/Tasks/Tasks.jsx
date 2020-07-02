@@ -46,7 +46,10 @@ export class Tasks extends Component {
 
       <tr>
  
-        <td>{this.props.title}</td>
+        <td>
+          <a href={this.props.url}>
+            {this.props.thing}</a></td>
+        <td>{this.props.date}</td>
 
       </tr>
     )
