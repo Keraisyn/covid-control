@@ -12,6 +12,73 @@ The wireless camera system is built on a Raspberry Pi Zero W with imagezmq which
 
 Covid Control was created for STEMComp 2020 as a submission for the technology category in June 2020.
 
+## Usage
+
+In order to use Covid Control, setup the three components:
+- Raspberry Pi
+- Server
+- Front end
+
+### Raspberry Pi
+For Raspberry Pi, navigate to the back-end folder and find client.py. Install dependencies.
+
+```
+pip install imagezmq
+pip install imutils
+```
+
+You may need more depending on the system. Install those as well.
+
+Then, start the client with the ip of the server.
+
+```
+python client.py --server-ip <your ip>
+```
+
+### Server
+For mask detection, navigate to the back-end folder and find mask_detection.py. Install dependencies.
+```
+pip install tensorflow
+pip install opencv-python
+pip install matplotlib
+pip install imagezmq
+```
+You may need more depending on the system. Install those as well.
+
+Start the server.
+
+```
+python mask_detection.py
+```
+
+For the Flask server, find server.py. Install dependencies.
+
+```
+pip install flask
+```
+
+You may want to adjust the port. Change the port argument to your desired port.
+
+```python
+app.run(port=5000)
+```
+
+Start the server.
+```
+python server.py
+```
+
+### Dashboard
+For the dashboard, navigate to the front-end folder. Install dependencies.
+```
+npm install
+```
+
+Make sure the API calls are to the right addresses. Start the app.
+```
+npm start
+```
+
 ## Contributors
 Matthews Ma
 
