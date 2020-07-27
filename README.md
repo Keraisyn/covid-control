@@ -85,5 +85,8 @@ Matthews Ma
 Samer Rustum
 
 ## Sources
-https://www.pyimagesearch.com/2020/05/04/covid-19-face-mask-detector-with-opencv-keras-tensorflow-and-deep-learning/
-https://github.com/jeffbass/imagezmq
+Prajna Bhandary for the dataset: <https://www.linkedin.com/feed/update/urn%3Ali%3Aactivity%3A6655711815361761280/>
+
+PyImageSearch for help with mask detection: <https://www.pyimagesearch.com/2020/05/04/covid-19-face-mask-detector-with-opencv-keras-tensorflow-and-deep-learning/>
+
+ImageZMQ for assistance in sending frames over the internet: <https://github.com/jeffbass/imagezmq>
