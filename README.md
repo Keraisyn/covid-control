@@ -8,6 +8,9 @@ Covid Control detects whether customers are wearing a mask. It consists of a wir
 
 The wireless camera system is built on a Raspberry Pi Zero W with imagezmq which sends frames to the server. The server runs a mask detection model with Keras and OpenCV to detect whether people in frame are wearing masks or not. This data is processed by a Python Flask server and sent to the React web application.
 
+## Video Demonstration
+<https://www.youtube.com/watch?v=9mKOeMvQPn4>
+
 ## Background
 
 Covid Control was created for STEMComp 2020 as a submission for the technology category in June 2020.
